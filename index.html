@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
+        <h1 class="text-4xl font-bold mb-6 text-gray-800">Jogo da Velha</h1>
+        <div id="status" class="text-xl mb-4 font-semibold text-gray-700">Vez do Jogador X</div>
+        <div class="grid grid-cols-3 gap-2">
+            <div id="cell-0" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-1" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-2" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-3" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-4" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-5" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-6" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-7" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+            <div id="cell-8" class="cell bg-gray-200 h-24 flex items-center justify-center text-5xl font-bold text-gray-900 cursor-pointer rounded-lg hover:bg-gray-300 transition-colors"></div>
+        </div>
+        <button id="restart-button" class="mt-6 px-6 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition-colors">Reiniciar Jogo</button>
+    </div>
+
+    <script>
+        const statusDisplay = document.getElementById('status');
+        const cells = document.querySelectorAll('.cell');
+        const restartButton = document.getElementById('restart-button');
+        
+        let gameActive = true;
+        let currentPlayer = "X";
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const handleResultValidation = () => {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = gameState[winCondition[0]];
+                let b = gameState[winCondition[1]];
+                let c = gameState[winCondition[2]];
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.innerHTML = `O Jogador ${currentPlayer} Venceu!`;
+                gameActive = false;
+                return;
+            }
+
+            let roundDraw = !gameState.includes("");
+            if (roundDraw) {
+                statusDisplay.innerHTML = 'Empate!';
+                gameActive = false;
+                return;
+            }
+
+            handlePlayerChange();
+        };
+
+        const handlePlayerChange = () => {
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusDisplay.innerHTML = `Vez do Jogador ${currentPlayer}`;
+        };
+
+        const handleCellPlayed = (clickedCell, clickedCellIndex) => {
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.innerHTML = currentPlayer;
+        };
+
+        const handleCellClick = (event) => {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.id.replace('cell-', ''));
+
+            if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                return;
+            }
+
+            handleCellPlayed(clickedCell, clickedCellIndex);
+            handleResultValidation();
+        };
+
+        const handleRestartGame = () => {
+            gameActive = true;
+            currentPlayer = "X";
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            statusDisplay.innerHTML = `Vez do Jogador ${currentPlayer}`;
+            cells.forEach(cell => cell.innerHTML = "");
+        };
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        restartButton.addEventListener('click', handleRestartGame);
+    </script>
+</body>
+</html>
